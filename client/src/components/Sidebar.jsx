@@ -19,17 +19,17 @@ export default function Sidebar({ chats, chatsLoading, activeChatId, onNewChat, 
       <aside
         className={`
           fixed lg:static inset-y-0 left-0 z-40
-          w-72 bg-zinc-950 border-r border-zinc-800
+          w-72 bg-zinc-50 dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800
           flex flex-col transition-transform duration-200
           ${open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:border-0 lg:overflow-hidden'}
         `}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-          <h1 className="text-lg font-bold text-white tracking-tight">Nexus AI</h1>
+        <div className="flex items-center justify-between p-4 border-b border-zinc-200 dark:border-zinc-800">
+          <h1 className="text-lg font-bold text-zinc-900 dark:text-white tracking-tight">Nexus AI</h1>
           <button
             onClick={onToggle}
-            className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 lg:hidden"
+            className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-lg text-zinc-500 dark:text-zinc-400 lg:hidden"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -57,8 +57,8 @@ export default function Sidebar({ chats, chatsLoading, activeChatId, onNewChat, 
               key={chat.id}
               className={`group flex items-center rounded-lg transition-colors ${
                 chat.id === activeChatId
-                  ? 'bg-zinc-800 text-white'
-                  : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
+                  ? 'bg-zinc-200 dark:bg-zinc-800 text-zinc-900 dark:text-white'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 hover:text-zinc-900 dark:hover:text-zinc-200'
               }`}
             >
               <Link
@@ -73,7 +73,7 @@ export default function Sidebar({ chats, chatsLoading, activeChatId, onNewChat, 
                   e.stopPropagation();
                   onDeleteChat(chat.id);
                 }}
-                className="hidden group-hover:block p-1.5 mr-1 hover:bg-zinc-700 rounded text-zinc-500 hover:text-red-400"
+                className="hidden group-hover:block p-1.5 mr-1 hover:bg-zinc-300 dark:hover:bg-zinc-700 rounded text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400"
               >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -89,15 +89,15 @@ export default function Sidebar({ chats, chatsLoading, activeChatId, onNewChat, 
           )}
 
           {!chatsLoading && chats.length === 0 && (
-            <p className="text-center text-zinc-600 text-sm py-8">No chats yet</p>
+            <p className="text-center text-zinc-400 dark:text-zinc-600 text-sm py-8">No chats yet</p>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-3 border-t border-zinc-800 space-y-2">
+        <div className="p-3 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
           <button
             onClick={toggle}
-            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
           >
             {dark ? (
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,10 +115,10 @@ export default function Sidebar({ chats, chatsLoading, activeChatId, onNewChat, 
             <div className="w-7 h-7 rounded-full bg-nexus-600 flex items-center justify-center text-xs font-bold text-white">
               {user?.name?.charAt(0).toUpperCase()}
             </div>
-            <span className="flex-1 text-sm text-zinc-300 truncate">{user?.name}</span>
+            <span className="flex-1 text-sm text-zinc-700 dark:text-zinc-300 truncate">{user?.name}</span>
             <button
               onClick={logout}
-              className="p-1.5 hover:bg-zinc-800 rounded text-zinc-500 hover:text-red-400"
+              className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 dark:text-zinc-500 hover:text-red-500 dark:hover:text-red-400"
               title="Sign out"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

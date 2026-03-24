@@ -130,7 +130,7 @@ export default function ChatPage() {
   );
 
   return (
-    <div className="flex h-screen bg-zinc-900 dark:bg-zinc-900 bg-white">
+    <div className="flex h-screen bg-white dark:bg-zinc-900">
       <Sidebar
         chats={chats}
         chatsLoading={chatsLoading}
@@ -143,17 +143,17 @@ export default function ChatPage() {
 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="flex items-center gap-3 p-3 border-b border-zinc-800 dark:border-zinc-800 border-zinc-200 lg:hidden">
+        <div className="flex items-center gap-3 p-3 border-b border-zinc-200 dark:border-zinc-800 lg:hidden">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 hover:bg-zinc-800 dark:hover:bg-zinc-800 hover:bg-zinc-100 rounded-lg text-zinc-400"
+            className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg text-zinc-500 dark:text-zinc-400"
             aria-label="Open sidebar"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="font-medium text-zinc-200 dark:text-zinc-200 text-zinc-800">Nexus AI</span>
+          <span className="font-medium text-zinc-800 dark:text-zinc-200">Nexus AI</span>
         </div>
 
         <ChatWindow messages={messages} streaming={streaming} loading={messagesLoading} />

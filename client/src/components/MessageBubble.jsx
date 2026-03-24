@@ -39,7 +39,7 @@ export default function MessageBubble({ message }) {
         className={`max-w-[80%] rounded-2xl px-4 py-3 ${
           isUser
             ? 'bg-nexus-600 text-white'
-            : 'bg-zinc-800 text-zinc-100 border border-zinc-700/50'
+            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700/50'
         }`}
       >
         {isUser ? (

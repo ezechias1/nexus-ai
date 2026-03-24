@@ -29,9 +29,9 @@ export default function ChatInput({ onSend, disabled }) {
   }
 
   return (
-    <div className="border-t border-zinc-800 bg-zinc-900 p-4">
+    <div className="border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
       <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-        <div className="flex items-end gap-2 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3 focus-within:border-nexus-500 focus-within:ring-1 focus-within:ring-nexus-500 transition-colors">
+        <div className="flex items-end gap-2 bg-zinc-100 dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-xl px-4 py-3 focus-within:border-nexus-500 focus-within:ring-1 focus-within:ring-nexus-500 transition-colors">
           <textarea
             ref={textareaRef}
             value={text}
@@ -40,7 +40,7 @@ export default function ChatInput({ onSend, disabled }) {
             placeholder="Type a message..."
             disabled={disabled}
             rows={1}
-            className="flex-1 bg-transparent text-white placeholder-zinc-500 resize-none focus:outline-none text-sm leading-relaxed max-h-[200px]"
+            className="flex-1 bg-transparent text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-500 resize-none focus:outline-none text-sm leading-relaxed max-h-[200px]"
           />
           <button
             type="submit"
