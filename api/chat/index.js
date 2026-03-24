@@ -7,11 +7,15 @@ export async function GET(req) {
   if (!user) return unauthorized();
 
   try {
+    const url = new URL(req.url);
+    const limit = Math.min(parseInt(url.searchParams.get('limit')) || 50, 100);
+    const offset = Math.max(parseInt(url.searchParams.get('offset')) || 0, 0);
+
     const result = await query(
       `SELECT c.*,
          (SELECT content FROM messages WHERE chat_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message
-       FROM chats c WHERE c.user_id = $1 ORDER BY c.updated_at DESC`,
-      [user.id]
+       FROM chats c WHERE c.user_id = $1 ORDER BY c.updated_at DESC LIMIT $2 OFFSET $3`,
+      [user.id, limit, offset]
     );
     return json(result.rows);
   } catch (err) {

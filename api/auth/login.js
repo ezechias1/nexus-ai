@@ -9,15 +9,15 @@ export async function POST(req) {
       return json({ error: 'Email and password are required' }, 400);
     }
 
-    const result = await query('SELECT * FROM users WHERE email = $1', [email]);
+    const result = await query('SELECT * FROM users WHERE email = $1', [email.toLowerCase()]);
     if (result.rows.length === 0) {
-      return json({ error: 'Invalid email or password' }, 401);
+      return json({ error: 'Invalid credentials' }, 401);
     }
 
     const user = result.rows[0];
     const valid = await bcrypt.compare(password, user.password_hash);
     if (!valid) {
-      return json({ error: 'Invalid email or password' }, 401);
+      return json({ error: 'Invalid credentials' }, 401);
     }
 
     const token = generateToken(user);
@@ -26,6 +26,7 @@ export async function POST(req) {
       token,
     });
   } catch (err) {
-    return json({ error: err.message }, 500);
+    console.error('Login error:', err.message);
+    return json({ error: 'Login failed' }, 500);
   }
 }

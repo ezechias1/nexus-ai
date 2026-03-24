@@ -26,9 +26,16 @@ export const api = {
   delete: (path) => request('DELETE', path),
 };
 
-// SSE streaming for chat messages
+// SSE streaming for chat messages with abort support
 export function streamMessage(chatId, content, provider, model, onChunk, onDone, onError) {
   const token = localStorage.getItem('token');
+  const abortController = new AbortController();
+
+  // 90 second timeout for AI responses
+  const timeout = setTimeout(() => {
+    abortController.abort();
+    onError(new Error('Response timed out'));
+  }, 90000);
 
   fetch(`${BASE_URL}/chat/${chatId}/messages`, {
     method: 'POST',
@@ -37,6 +44,7 @@ export function streamMessage(chatId, content, provider, model, onChunk, onDone,
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({ content, provider, model }),
+    signal: abortController.signal,
   })
     .then(async (res) => {
       if (!res.ok) {
@@ -74,5 +82,18 @@ export function streamMessage(chatId, content, provider, model, onChunk, onDone,
         }
       }
     })
-    .catch(onError);
+    .catch((err) => {
+      if (err.name !== 'AbortError') {
+        onError(err);
+      }
+    })
+    .finally(() => {
+      clearTimeout(timeout);
+    });
+
+  // Return abort function for cleanup
+  return () => {
+    clearTimeout(timeout);
+    abortController.abort();
+  };
 }

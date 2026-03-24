@@ -12,4 +12,14 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'markdown': ['react-markdown', 'react-syntax-highlighter'],
+        },
+      },
+    },
+  },
 });

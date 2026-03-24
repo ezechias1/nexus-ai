@@ -16,7 +16,7 @@ export async function GET(req) {
       sql += ' AND category = $2';
       params.push(category);
     }
-    sql += ' ORDER BY importance DESC, updated_at DESC';
+    sql += ' ORDER BY importance DESC, updated_at DESC LIMIT 100';
 
     const result = await query(sql, params);
     return json(result.rows);
@@ -32,7 +32,20 @@ export async function POST(req) {
 
   try {
     const { key, value, category, importance } = await req.json();
-    if (!key || !value) return json({ error: 'Key and value are required' }, 400);
+
+    // Input validation
+    if (!key || typeof key !== 'string' || key.trim().length === 0 || key.length > 255) {
+      return json({ error: 'Key must be 1-255 characters' }, 400);
+    }
+    if (!value || typeof value !== 'string' || value.trim().length === 0 || value.length > 5000) {
+      return json({ error: 'Value must be 1-5000 characters' }, 400);
+    }
+    if (category && (typeof category !== 'string' || category.length > 50)) {
+      return json({ error: 'Category must be max 50 characters' }, 400);
+    }
+    if (importance !== undefined && (typeof importance !== 'number' || importance < 1 || importance > 10)) {
+      return json({ error: 'Importance must be a number between 1-10' }, 400);
+    }
 
     const result = await query(
       `INSERT INTO memories (user_id, key, value, category, importance)
@@ -40,7 +53,7 @@ export async function POST(req) {
        ON CONFLICT (user_id, key)
        DO UPDATE SET value = $3, category = $4, importance = $5, updated_at = NOW()
        RETURNING *`,
-      [user.id, key, value, category || 'general', importance || 5]
+      [user.id, key.trim(), value.trim(), category || 'general', importance || 5]
     );
     return json(result.rows[0], 201);
   } catch (err) {

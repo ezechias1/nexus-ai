@@ -1,12 +1,20 @@
 import { useEffect, useRef } from 'react';
 import MessageBubble from './MessageBubble';
 
-export default function ChatWindow({ messages, streaming }) {
+export default function ChatWindow({ messages, streaming, loading }) {
   const bottomRef = useRef(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-2 border-nexus-500 border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
   if (messages.length === 0) {
     return (

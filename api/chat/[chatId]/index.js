@@ -24,9 +24,13 @@ export async function PATCH(req, { params }) {
 
   try {
     const { title } = await req.json();
+    if (!title || typeof title !== 'string' || title.trim().length === 0) {
+      return json({ error: 'Title is required' }, 400);
+    }
+    const trimmedTitle = title.trim().substring(0, 100);
     const result = await query(
       'UPDATE chats SET title = $1, updated_at = NOW() WHERE id = $2 AND user_id = $3 RETURNING *',
-      [title, chatId, user.id]
+      [trimmedTitle, chatId, user.id]
     );
     if (result.rows.length === 0) return json({ error: 'Chat not found' }, 404);
     return json(result.rows[0]);

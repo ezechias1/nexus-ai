@@ -31,7 +31,12 @@ export async function POST(req, { params }) {
 
   try {
     const { content, provider, model } = await req.json();
-    if (!content) return json({ error: 'Message content is required' }, 400);
+    if (!content || typeof content !== 'string') {
+      return json({ error: 'Message content is required' }, 400);
+    }
+    if (content.length > 10000) {
+      return json({ error: 'Message too long (max 10000 chars)' }, 400);
+    }
 
     // Verify chat ownership
     const chatResult = await query('SELECT * FROM chats WHERE id = $1 AND user_id = $2', [chatId, user.id]);
@@ -50,7 +55,7 @@ export async function POST(req, { params }) {
       await query('UPDATE chats SET title = $1 WHERE id = $2', [titleSnippet, chatId]);
     }
 
-    // Get chat history
+    // Get chat history (limit to recent 50 messages for context window)
     const history = await query(
       'SELECT role, content FROM messages WHERE chat_id = $1 ORDER BY created_at ASC LIMIT 50',
       [chatId]
@@ -59,7 +64,7 @@ export async function POST(req, { params }) {
     // Get relevant memories
     const memories = await getRelevantMemories(user.id, content);
 
-    // Build system prompt
+    // Build system prompt with memory injection
     let systemPrompt = 'You are Nexus AI, a helpful and knowledgeable assistant. Be concise, clear, and helpful.';
     if (memories.length > 0) {
       const memCtx = memories.map((m) => `- ${m.key}: ${m.value}`).join('\n');
@@ -96,21 +101,30 @@ export async function POST(req, { params }) {
             }
             if (chunk.choices[0]?.finish_reason === 'stop') break;
           }
+        } catch (streamErr) {
+          const errMsg = streamErr.message || 'Stream error';
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: errMsg })}\n\n`));
+          console.error('Stream error:', errMsg);
+        } finally {
+          // Always save the assistant message (even partial on error)
+          if (fullResponse) {
+            try {
+              await query(
+                'INSERT INTO messages (chat_id, user_id, role, content, model) VALUES ($1, $2, $3, $4, $5)',
+                [chatId, user.id, 'assistant', fullResponse, usedModel]
+              );
+              await query('UPDATE chats SET updated_at = NOW() WHERE id = $1', [chatId]);
+            } catch (dbErr) {
+              console.error('Failed to save assistant message:', dbErr.message);
+            }
+          }
 
-          // Save assistant message
-          await query(
-            'INSERT INTO messages (chat_id, user_id, role, content, model) VALUES ($1, $2, $3, $4, $5)',
-            [chatId, user.id, 'assistant', fullResponse, usedModel]
-          );
-          await query('UPDATE chats SET updated_at = NOW() WHERE id = $1', [chatId]);
-
-          // Extract memories in background
-          extractAndSaveMemories(user.id, content).catch(() => {});
+          // Extract memories from the conversation
+          extractAndSaveMemories(user.id, content, fullResponse).catch((err) => {
+            console.error('Memory extraction failed:', err.message);
+          });
 
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ done: true })}\n\n`));
-          controller.close();
-        } catch (err) {
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: err.message })}\n\n`));
           controller.close();
         }
       },
@@ -124,6 +138,7 @@ export async function POST(req, { params }) {
       },
     });
   } catch (err) {
+    console.error('Message POST error:', err.message);
     return json({ error: err.message }, 500);
   }
 }

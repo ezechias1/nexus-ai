@@ -2,7 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { Link } from 'react-router-dom';
 
-export default function Sidebar({ chats, activeChatId, onNewChat, onDeleteChat, open, onToggle }) {
+export default function Sidebar({ chats, chatsLoading, activeChatId, onNewChat, onDeleteChat, open, onToggle }) {
   const { user, logout } = useAuth();
   const { dark, toggle } = useTheme();
 
@@ -82,7 +82,13 @@ export default function Sidebar({ chats, activeChatId, onNewChat, onDeleteChat, 
             </div>
           ))}
 
-          {chats.length === 0 && (
+          {chatsLoading && (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin h-5 w-5 border-2 border-nexus-500 border-t-transparent rounded-full" />
+            </div>
+          )}
+
+          {!chatsLoading && chats.length === 0 && (
             <p className="text-center text-zinc-600 text-sm py-8">No chats yet</p>
           )}
         </div>

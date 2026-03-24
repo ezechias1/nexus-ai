@@ -27,17 +27,18 @@ export async function getRelevantMemories(userId, messageContent) {
   return result.rows;
 }
 
-export async function extractAndSaveMemories(userId, message) {
+export async function extractAndSaveMemories(userId, userMessage, aiResponse) {
   const patterns = [
     { regex: /my name is (\w+)/i, key: 'user_name', category: 'personal' },
     { regex: /i (?:work|am working) (?:at|for|in) (.+?)(?:\.|,|$)/i, key: 'workplace', category: 'professional' },
     { regex: /i (?:like|love|enjoy|prefer) (.+?)(?:\.|,|$)/i, key: 'preference', category: 'preferences' },
     { regex: /i(?:'m| am) (?:a|an) (.+?)(?:\.|,|$)/i, key: 'role', category: 'personal' },
     { regex: /i live in (.+?)(?:\.|,|$)/i, key: 'location', category: 'personal' },
+    { regex: /i speak (.+?)(?:\.|,|$)/i, key: 'languages', category: 'personal' },
   ];
 
   for (const pattern of patterns) {
-    const match = message.match(pattern.regex);
+    const match = userMessage.match(pattern.regex);
     if (match) {
       try {
         await query(
@@ -46,7 +47,9 @@ export async function extractAndSaveMemories(userId, message) {
            ON CONFLICT (user_id, key) DO UPDATE SET value = $3, updated_at = NOW()`,
           [userId, pattern.key, match[1].trim(), pattern.category]
         );
-      } catch { /* silent */ }
+      } catch (err) {
+        console.error('Memory extraction failed:', err.message);
+      }
     }
   }
 }

@@ -46,6 +46,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-nexus-500 focus:ring-1 focus:ring-nexus-500"
               placeholder="you@example.com"
             />
@@ -58,6 +59,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
               className="w-full px-3 py-2 bg-zinc-900 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-nexus-500 focus:ring-1 focus:ring-nexus-500"
               placeholder="Enter your password"
             />
